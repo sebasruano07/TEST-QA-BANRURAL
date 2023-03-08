@@ -28,7 +28,7 @@
       <p>Hemos seleccionado un número aleatorío entre 1 a 100. Trata de adivinar el número, en un total de 10 turnos o menos. No te preocupes, te diremos sí el número es más alto o más bajo </p>
 
 <div class="form">
-  <label for="guessField">Ingresa el número a adivinar: </label><input type="text" id="guessField" class="guessField">
+  <label for="guessField">Ingresa el número a adivinar: </label><input type="number" id="guessField" class="guessField"> <!-- Cambio del tipo de dato -->
   <input type="submit" value="Ingresar el número aleatorio" class="guessSubmit">
 </div>
 
@@ -41,50 +41,73 @@
 </body>
 
 <script>
-  let randomNumber = Math.random() * 10;
+  //Creación del número aleatorio
+  let randomNumber = Math.ceil(Math.random()*100); //La funcion no era correcta ya que salian numeros flotantes
 
-  const ATTEMPS = 5;
+  const ATTEMPS = 10; //Los intentos solamente estaban en 5
   const guesses = document.querySelector('.guesses');
   const lastResult = document.querySelector('.lastResult');
-  const lowOrHi = document.querySelector('lowOrHi');
+  const lowOrHi = document.querySelector('.lowOrHi'); //Faltaba punto
   const guessSubmit = document.querySelector('.guessSubmit');
   const guessField = document.querySelector('.guessField');
 
   let guessCount = 1;
   let resetButton;
+  let maximo = 100;
 
+  //Función que verifica el número
   function checkGuess() {
 
-    let userGuess = guessField.value;
-    if(guessCount === 1) {
+    let userGuess = parseFloat(guessField.value); //Cambiamos un string por un float
+    console.log(guessCount);
+
+    var booleano = Number.isInteger(userGuess); //Verificar si el número que ingreso el usuario contiene decimales
+    console.log(booleano); //Impresión de consola para verificar que el número contenga decimales
+
+    if((guessCount === 1) && (booleano == true) && (userGuess <= maximo)) {
       guesses.textContent = 'Número aleatorio anterior: ';
     }
-    guesses.textContent += userGuess + ' ';
+    if((booleano == true) && (userGuess <= maximo)) {
+      guesses.textContent += userGuess + ' '; //Verificación de escritura de números enteros
+    }  
 
-    if(userGuess === randomNumber) {
+    console.log(userGuess, ' ', randomNumber); //Impresión de consola para verificar el número ingresado del usuario y el generado
+
+    if(guessCount === ATTEMPS) { //Se corrigio la variable randomNumber por ATTEMPS
       lastResult.textContent = '!!!Pérdistes!!!';
-      lastResult.style.backgroundColor = 'black';
+      lastResult.style.backgroundColor = 'red'; //Se corrigio el color 
       lowOrHi.textContent = '';
       setGameOver();
-    } else if(guessCount === ATTEMPS) {
+    } else if(userGuess == randomNumber) { //Se corrigio la variable ATTEMPS por randomNumber
       lastResult.textContent = 'Felicitaciones! adivinaste el número!';
-      lastResult.style.backgroundColor = 'red';
+      lastResult.style.backgroundColor = 'green'; //Se corrigio el color 
+      lowOrHi.textContent = ''; //Se borra el texto del número mayor o menor
       setGameOver();
     } else {
       lastResult.textContent = 'Incorrecto! ';
-      lastResult.style.backgroundColor = 'green';
-      if(userGuess < randomNumber) {
-        lowOrHi.textContent = 'El número es mayor!';
+      lastResult.style.backgroundColor = 'black'; //Se corrigio el color 
+
+      if (booleano == false) { //If que verifica si el número es entero
+        window.alert('NO PUEDES INGRESAR NÚMEROS DECIMALES');
+        lowOrHi.textContent = '';
+        //guessCount--;
+      } else if (userGuess > maximo) { //verificación de números no mayores a 100
+          window.alert('NO PUEDES INGRESAR NÚMEROS MAYORES A 100');
+          lowOrHi.textContent = '';
+      } else if(userGuess < randomNumber) {
+          lowOrHi.textContent = 'El número es mayor!';
       } else if(userGuess > randomNumber) {
-        lowOrHi.textContent = 'El número es menor!';
+          lowOrHi.textContent = 'El número es menor!';
       }
     }
-
-    guessCount++;
+    if ((booleano == true) && (userGuess <= maximo)) { 
+      guessCount++; //Verificación para sumar los intentos
+    }
+    
     guessField.value = '';
     guessField.focus();
   }
-  guessSubmit.addeventListener('click', checkGuess);
+  guessSubmit.addEventListener('click', checkGuess); //Se corriguio la funcion addEventListener ya que estaba mal escrita
 
   function setGameOver() {
 	  guessField.disabled = true;
@@ -92,7 +115,7 @@
 	  resetButton = document.createElement('button');
 	  resetButton.textContent = 'Comienza un nuevo juego';
 	  document.body.appendChild(resetButton);
-	  resetButton.addeventListener('click', resetGame);
+	  resetButton.addEventListener('click', resetGame); //Se corriguio la funcion addEventListener ya que estaba mal escrita
   }
 
   function resetGame() {
@@ -111,7 +134,7 @@
 
 	  lastResult.style.backgroundColor = 'white';
 
-	  randomNumber = Math.floor(Math.random()) + 1;
+	  randomNumber = Math.ceil(Math.random()*100); //La funcion no era correcta porque solo colocaba el número 1
   }
 </script>
 </html>
